@@ -6,9 +6,9 @@
    * [Harbor and Tanzu Kubernetes Grid](#harbor-and-tanzu-kubernetes-grid)
       * [Table of Contents](#table-of-contents)
       * [About](#about)
-      * [Terms and Abbreviations](#terms-and-abbreviations)
       * [Requirements](#requirements)
-      * [OPTIONAL: Create a TKG Cluster](#optional-create-a-tkg-cluster)
+      * [Terms and Abbreviations](#terms-and-abbreviations)
+      * [Create a TKG Cluster](#create-a-tkg-cluster)
       * [Certificate Authority](#certificate-authority)
          * [Install mkcert](#install-mkcert)
          * [Create Certificate](#create-certificate)
@@ -31,7 +31,7 @@
 
 In this demo we will deploy a basic Harbor instance to a Kubernetes cluster using helm. 
 
-The purpose of this demo is not necessarily to create a production instance of Harbor, though we will ensure it has the right TLS certificates. Instead this can be used as an introduction to Harbor and Helm, and act as a starting point for building a production level helm chart.
+The purpose of this demo is not necessarily to create a production instance of Harbor, though we do things like ensure it has the TLS certificates. Instead this can be used as an introduction to Harbor and Helm, and act as a starting point for building a production level helm chart. Gotta start somewhere!
 
 **Harbor**
 
@@ -41,15 +41,22 @@ Harbor is also much more than a simple container registry, and supports features
 
 **vSphere with Tanzu**
 
-In this demo the Kubernetes cluster is a workload Tanzu Kubernetes Grid (TKG) cluster created by vSphere with Tanzu, also known as vSphere with Kubernetes or the TKG service. That said, any modern Kubernetes cluster with a configured load balancer and persistent volumes will suffice.
+In this demo the Kubernetes cluster is a workload Tanzu Kubernetes Grid (TKG) cluster created by [vSphere with Tanzu](https://blogs.vmware.com/vsphere/2020/09/announcing-vsphere-with-tanzu.html), also known as vSphere with Kubernetes or the TKG service. That said, any modern Kubernetes cluster with a configured load balancer and persistent volumes will suffice.
 
-The Kubernetes clusters that vSphere with Tanzu deploys are completely conformant Kubernetes clusters and can be used like any other Kubernete cluster.
+The Kubernetes clusters that vSphere with Tanzu deploys are completely conformant Kubernetes clusters and can be used like any other Kubernetes cluster.
 
 **Tanzu Application Catalog**
 
 This demo also uses the [Tanzu Application Catalog](https://tanzu.vmware.com/application-catalog) Harbor helm chart, which is currently available for use as a trial, and there is no need to sign up, we can simply point helm at the trial TAC helm chart repository available to anyone.
 
 The open source Harbor project also provides a [similar helm chart](https://github.com/goharbor/harbor-helm), but for the purposes of this demo we will pull the helm chart directly from TAC.
+
+## Requirements
+
+* A Kubernetes cluster with a `LoadBalancer` and persistent volumes
+* A Linux, Windows WSL, or MacOS terminal to use various commands
+* Helm CLI installed
+* Optional: kubectx and kubens installed
 
 ## Terms and Abbreviations
 
@@ -62,13 +69,7 @@ alias kubectl=k
 * kubens and kubectx are often used to switch between clusters and namespaces. Also they are typically aliased to kn and kc respectively.
 * `SNIP!` is used in command output to indicate some removed text.
 
-## Requirements
-
-* A Kubernetes cluster with a `LoadBalancer` and persistent volumes
-* A Linux, Windows WSL, or MacOS terminal to use various commands
-* Helm CLI installed
-
-## OPTIONAL: Create a TKG Cluster
+## Create a TKG Cluster
 
 Since we are going to deploy Harbor to a TKG cluster, we actually need a TKG cluster.
 
@@ -560,7 +561,7 @@ Now ensure the DNS name you gave the harbor service resolves.
 In my case I'm simply using DNSmasq as my DNS server, and I've configured the below. Your DNS server will be different, but the same configuration should be made.
 
 ```
-# grep harbor.wcp-workloads /etc/hosts
+$ grep harbor.wcp-workloads /etc/hosts
 10.1.1.5 harbor.harbor.wcp-workloads.oakwood.ave
 10.1.1.5 core.harbor.wcp-workloads.oakwood.ave
 10.1.1.5 notary.harbor.wcp-workloads.oakwood.ave
