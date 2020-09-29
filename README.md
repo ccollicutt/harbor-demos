@@ -5,6 +5,7 @@
 <!--ts-->
    * [Harbor and Tanzu Kubernetes Grid](#harbor-and-tanzu-kubernetes-grid)
       * [Table of Contents](#table-of-contents)
+      * [About](#about)
       * [Terms and Abbreviations](#terms-and-abbreviations)
       * [Requirements](#requirements)
       * [OPTIONAL: Create a TKG Cluster](#optional-create-a-tkg-cluster)
@@ -28,6 +29,22 @@
          * [Push an Image](#push-an-image)
       * [Clean Up](#clean-up)
 <!--te-->
+
+## About
+
+In this demo we will deploy a basic Harbor instance to a Kubernetes cluster using helm. 
+
+**vSphere with Tanzu**
+
+In this demo the Kubernetes cluster is a workload Tanzu Kubernetes Grid (TKG) cluster created by vSphere with Tanzu, also known as vSphere with Kubernetes or the TKG service. That said, any modern Kubernetes cluster with a configured load balancer and persistent volumes will suffice.
+
+The Kubernetes clusters that vSphere with Tanzu deploys are completely conformant Kubernetes clusters and can be used like any other Kubernete cluster.
+
+**Tanzu Application Catalog**
+
+This demo also uses the [Tanzu Application Catalog](https://tanzu.vmware.com/application-catalog) Harbor helm chart, which is currently available for use as a demo. 
+
+The open source Harbor project also provides a [similar helm chart](https://github.com/goharbor/harbor-helm), but for the purposes of this demo we will pull the helm chart directly from TAC.
 
 ## Terms and Abbreviations
 
