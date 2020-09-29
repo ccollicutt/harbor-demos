@@ -31,7 +31,7 @@
 
 In this demo we will deploy a basic Harbor instance to a Kubernetes cluster using helm. 
 
-The purpose of this demo is not necessarily to create a production instance of Harbor, though we do things like ensure it has the TLS certificates. Instead this can be used as an introduction to Harbor and Helm, and act as a starting point for building a production level helm chart. Gotta start somewhere!
+The purpose of this demo is not necessarily to create a production instance of Harbor. Instead this can be used as an introduction to Harbor and Helm, and act as a starting point for building a production level helm chart. Gotta start somewhere!
 
 **Harbor**
 
@@ -56,7 +56,7 @@ The open source Harbor project also provides a [similar helm chart](https://gith
 * A Kubernetes cluster with a `LoadBalancer` and persistent volumes
 * A Linux, Windows WSL, or MacOS terminal to use various commands
 * Helm CLI installed
-* Optional: kubectx and kubens installed
+* Optional: `kubectx` and `kubens` installed
 
 ## Terms and Abbreviations
 
@@ -66,20 +66,20 @@ The open source Harbor project also provides a [similar helm chart](https://gith
 alias kubectl=k
 ```
 
-* kubens and kubectx are often used to switch between clusters and namespaces. Also they are typically aliased to kn and kc respectively.
+* `kubens` and `kubectx` are often used to switch between clusters and namespaces. Also they are typically aliased to kn and kc respectively.
 * `SNIP!` is used in command output to indicate some removed text.
 
 ## Create a TKG Cluster
 
-Since we are going to deploy Harbor to a TKG cluster, we actually need a TKG cluster.
+Since we are going to deploy Harbor to a Kubernetes cluster, we actually need a Kubernets cluster.
 
-The Tanzu Kubernetes Grid service has been deployed into a vSphere cluster.
+The Tanzu Kubernetes Grid service has been deployed into a vSphere cluster and that will be used to create a TKG workload cluster.
 
 *NOTE: Any Kubernetes cluster should be fine, as long as it provides a `LoadBalancer`. This demo uses a "vSphere with Tanzu" based workload cluster.*
 
 *NOTE: vSphere with Tanzu/Kubernetes also has a native, integrated Harbor deployment (very easy to use, just click "Harbor Enable"), but this demo will not use that option and instead, for the purposes of demonstration, deploy a completely separate Harbor deployment.*
 
-Now we can build a TKG workload cluster by "talking Kubernetes" to the service cluster, and the way that you usually talk to Kubernetes is via YAML.
+Now we can build a TKG workload cluster by "talking Kubernetes" to the service cluster, and the way that you usually talk to Kubernetes is via, yes, you guessed it, YAML.
 
 **Create a Supervisor Namespace**
 
@@ -338,7 +338,7 @@ That's it!
 Download the values file.
 
 ```
-helm show values tac/harbor > harbor-values.yaml
+helm show values tac/harbor > values.yml
 ```
 
 Now that we have the values file, we can edit it and configure it for our environment.
@@ -391,7 +391,7 @@ There are a few lines to edit in the values file.
 * OPTIONAL: Set a load balancer IP
 
 ```
-$ diff values.yaml values.yaml.orig 
+$ diff values.yml values.yml.orig 
 5c5
 < global:
 ---
@@ -487,7 +487,7 @@ k create -f harbor-rbac.yml
 ### Deploy 
 
 ```
-$ helm install harbor tac/harbor --debug --version 7.2.0 -f harbor/values.yaml
+$ helm install harbor tac/harbor --debug --version 7.2.0 -f values.yml
 
 SNIP!
 NOTES:
