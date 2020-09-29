@@ -13,10 +13,6 @@
          * [Install mkcert](#install-mkcert)
          * [Create Certificate](#create-certificate)
       * [Deploy Harbor](#deploy-harbor)
-         * [Using the Tanzu Application Catalog](#using-the-tanzu-application-catalog)
-            * [What is the Tanzu Application Catalog?](#what-is-the-tanzu-application-catalog)
-            * [Using TAC](#using-tac)
-            * [Add the TAC Repo](#add-the-tac-repo)
          * [Obtain the Values File](#obtain-the-values-file)
          * [Add a Namespace](#add-a-namespace)
          * [Create a TLS Secret](#create-a-tls-secret)
@@ -33,6 +29,14 @@
 ## About
 
 In this demo we will deploy a basic Harbor instance to a Kubernetes cluster using helm. 
+
+The purpose of this demo is not necessarily to create a production instance of Harbor, though we will ensure it has the right TLS certificates. Instead this can be used as an introduction to Harbor and Helm, and act as a starting point for building a production level helm chart.
+
+**Harbor**
+
+[Harbor](https://goharbor.io/) is an enterprise level open source container registry. It supports all the features that most enterprise oragnaizations would need to run their own conatiner image regsitry. As well, it is a Cloud Native Computing Foudnation (CNCF) graduated project.
+
+Harbor is also much more than a simple container registry, and supports features like image signing, replication, and more.
 
 **vSphere with Tanzu**
 
@@ -99,7 +103,7 @@ If you haven't already downloaded the vSphere kubectl plugin, you can find a con
 
 Linux will be used for this demo, so the Linux CLI is installed.
 
-Now we login to the supervisor cluster.
+Now login to the supervisor cluster.
 
 ```
 $ k vsphere login --server wcp.oakwood.ave -u administrator@vsphere.local --insecure-skip-tls-verify
@@ -109,8 +113,6 @@ Logged in successfully.
 
 You have access to the following contexts:
    harbor-namespace
-   tbs-kc
-   test-namespace
    wcp.oakwood.ave
 
 If the context you wish to use is not in this list, you may need to try
@@ -290,9 +292,7 @@ One option is the [Tanzu Application Catalog](https://tanzu.vmware.com/applicati
 
 At this time a demo site exists for helm charts that is available for use.
 
-### Using the Tanzu Application Catalog
-
-#### What is the Tanzu Application Catalog?
+**Using the Tanzu Application Catalog**
 
 What is the Tanzu Application Catalog (TAC)?
 
@@ -308,11 +308,11 @@ And one of the helm charts availble is for Harbor.
 
 ![harbor tac helm chart](images/tac2.png)
 
-#### Using TAC
+**Using TAC**
 
 There are [good instuctions](https://docs.bitnami.com/tanzu-application-catalog/how-to/consume-tac-kubeapps/) as to how to consume TAC.
 
-#### Add the TAC Repo
+**Add the TAC Repo**
 
 Add the TAC helm chart repo.
 
