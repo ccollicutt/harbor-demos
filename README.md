@@ -64,8 +64,8 @@ alias kubectl=k
 
 ## Requirements
 
-* A Kubernetes cluster with a `LoadBalancer`
-* A Linux host to use various `kubectl` commands
+* A Kubernetes cluster with a `LoadBalancer` and persistent volumes
+* A Linux, Windows WSL, or MacOS terminal to use various commands
 * Helm CLI installed
 
 ## OPTIONAL: Create a TKG Cluster
@@ -80,6 +80,8 @@ The Tanzu Kubernetes Grid service has been deployed into a vSphere cluster.
 
 Now we can build a TKG workload cluster by "talking Kubernetes" to the service cluster, and the way that you usually talk to Kubernetes is via YAML.
 
+**Create a Supervisor Namespace**
+
 First, in vSphere, create and configure a "harbor-namespace"...er...namespace. Actually this is most easily identified as a "supervisor namespace."
 
 ```
@@ -92,17 +94,23 @@ The namespaces name can be anything you want, but it would have to match up with
 
 Note that this "namespace" is a higher level construction, a "supervisor namespace" where VMware Administrators can configure quotas, access, storage policies, etc.
 
+**Assign Roles and Resources**
+
 Now that that supervisor namespace has been created, assign users, storage policies, and capacity and usage.
 
 ![harbor supervisor namespace](images/ns2.png)
 
 Once those have been created, we can deploy a TKG cluster to that supervisor namespace.
 
+**Install the vSphere Kubectl Plugin**
+
 If you haven't already downloaded the vSphere kubectl plugin, you can find a convenient link on the namespace page, look for "Link to CLI Tools" and click on "Open" which will bring you to this page.
 
 ![cli tools download](images/cli-download1.png)
 
 Linux will be used for this demo, so the Linux CLI is installed.
+
+**Login to the Supervisor Cluster**
 
 Now login to the supervisor cluster.
 
@@ -122,9 +130,9 @@ logging in again later, or contact your cluster administrator.
 To change context, use `kubectl config use-context <workload name>`
 ```
 
-At this point we can deploy a TKG workload cluster.
+**Deploy a TKG Workload Cluster**
 
-Below is the YAML used to define that cluster.
+At this point we can deploy a TKG workload cluster. Below is the YAML used to define that cluster.
 
 ```
 # file: harbor-cluster.yml
@@ -189,12 +197,13 @@ harbor-cluster-workers-lf27f-5566d664b6-h4cv2   42m
 
 As you can see above, we have a single control plane node and three worker nodes.
 
+**Login to the Workload Cluster**
+
 Login to that new cluster, i.e. get the credentials:
 
 ```
 k vsphere login --server wcp.oakwood.ave -u administrator@vsphere.local --insecure-skip-tls-verify --tanzu-kubernetes-cluster-namespace=harbor-namespace --tanzu-kubernetes-cluster-name harbor-cluster 
 ```
-
 
 e.g. output:
 
@@ -562,7 +571,7 @@ In my case I'm simply using DNSmasq as my DNS server, and I've configured the be
 Ensure that the TLS certificate available on the main service IP/Domain is the one that was created by `mkcert`.
 
 ```
-$ openssl s_client -showcerts -connect harbor.harbor.wcp-workloads.oakwood.ave:443 </dev/nullopenssl s_client -showcerts -servername www.example.com -connect www.example.com:443 </dev/null
+$ openssl s_client -showcerts -connect harbor.harbor.wcp-workloads.oakwood.ave:443 </dev/null
 ```
 
 ### Login to Harbor
