@@ -23,6 +23,7 @@
          * [Validate Certificate](#validate-certificate)
          * [Login to Harbor](#login-to-harbor)
          * [Push an Image](#push-an-image)
+      * [Conclusion](#conclusion)
       * [Clean Up](#clean-up)
 <!--te-->
 
@@ -46,7 +47,7 @@ The Kubernetes clusters that vSphere with Tanzu deploys are completely conforman
 
 **Tanzu Application Catalog**
 
-This demo also uses the [Tanzu Application Catalog](https://tanzu.vmware.com/application-catalog) Harbor helm chart, which is currently available for use as a demo. 
+This demo also uses the [Tanzu Application Catalog](https://tanzu.vmware.com/application-catalog) Harbor helm chart, which is currently available for use as a trial, and there is no need to sign up, we can simply point helm at the trial TAC helm chart repository available to anyone.
 
 The open source Harbor project also provides a [similar helm chart](https://github.com/goharbor/harbor-helm), but for the purposes of this demo we will pull the helm chart directly from TAC.
 
@@ -633,6 +634,12 @@ In the Harbor GUI, the nginx repository should now be visible.
 
 ![harbor nginx image](images/harbor2.png)
 
+## Conclusion
+
+At this point a fully usable Harbor instance has been deployed to Kuberentes via helm, and images can be pushed to it. It's amazing what you can do with a helm chart and a few variables.
+
+It's important to note that in order to use this registry from a Kubernetes cluster the cluster nodes would have to have the Certificate Authority installed. 
+
 ## Clean Up
 
 Ensure you are in the right cluster and namespace!
@@ -644,4 +651,4 @@ helm delete harbor
 for i in `k get pvc | grep -v NAME | tr -s " " | cut -f 1 -d " "`; do k delete pvc $i; done
 ```
 
-In vSphere, remove the `harbor-namespace` supervisor namespace.
+In vSphere, remove the `harbor-namespace` supervisor namespace. Of course this will delete the entire cluster that was created!
