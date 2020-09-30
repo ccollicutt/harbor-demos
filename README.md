@@ -1,9 +1,9 @@
-# Harbor and Tanzu Kubernetes Grid 
+# Deploy Harbor with Helm
 
 ## Table of Contents
 
 <!--ts-->
-   * [Harbor and Tanzu Kubernetes Grid](#harbor-and-tanzu-kubernetes-grid)
+   * [Deploy Harbor with Helm](#deploy-harbor-with-helm)
       * [Table of Contents](#table-of-contents)
       * [About](#about)
       * [Requirements](#requirements)
@@ -58,7 +58,7 @@ The open source Harbor project also provides a [similar helm chart](https://gith
 * Optional: `kubectx` and `kubens` installed
 * `mkcert` will also be used to manage certificates
 * Ability to manage DNS entries
-* Docker installed to push and pull imagess
+* Docker installed to push and pull images
 
 ## Terms and Abbreviations
 
@@ -75,11 +75,11 @@ alias kubectl=k
 
 Since we are going to deploy Harbor to a Kubernetes cluster, we actually need a Kubernets cluster.
 
-The Tanzu Kubernetes Grid service has been deployed into a vSphere cluster and that will be used to create a TKG workload cluster.
+The Tanzu Kubernetes Grid service (TKGs) has been deployed into a vSphere cluster and that will be used to create a TKG workload cluster.
 
-*NOTE: Any Kubernetes cluster should be fine, as long as it provides a `LoadBalancer`. This demo uses a "vSphere with Tanzu" based workload cluster.*
+*NOTE: Any Kubernetes cluster should be fine, as long as it provides a `LoadBalancer` and persistent volumes. This demo uses a "vSphere with Tanzu" based TKG workload cluster.*
 
-*NOTE: vSphere with Tanzu/Kubernetes also has a native, integrated Harbor deployment (very easy to use, just click "Harbor Enable"), but this demo will not use that option and instead, for the purposes of demonstration, deploy a completely separate Harbor deployment.*
+*NOTE: vSphere with Tanzu/Kubernetes also has a native, integrated Harbor deployment (very easy to use, just click "Harbor Enable") but this demo will not use that option and instead, for the purposes of demonstration, deploy a completely separate Harbor deployment.*
 
 Now we can build a TKG workload cluster by "talking Kubernetes" to the service cluster, and the way that you usually talk to Kubernetes is via, yes, you guessed it, YAML, and we'll use `kubectl` to apply that YAML.
 
@@ -600,7 +600,7 @@ https://docs.docker.com/engine/reference/commandline/login/#credentials-store
 Login Succeeded
 ```
 
-Let's push an nginx image.
+Let's pull a nginx image.
 
 ```
 $ docker pull nginx
@@ -616,7 +616,7 @@ Status: Downloaded newer image for nginx:latest
 docker.io/library/nginx:latest
 ```
 
-Tag that image.
+Tag that image so we can push it to the Harbor we just installed.
 
 ```
 $ docker tag nginx harbor.harbor.wcp-workloads.oakwood.ave/library/nginx
