@@ -60,6 +60,13 @@ The open source Harbor project also provides a [similar helm chart](https://gith
 * Ability to manage DNS entries
 * Docker installed to push and pull images
 
+## Versions
+
+* Kubernetes - 1.17
+* TAC Harbor Helm chart - 7.2.0
+* Harbor - 2.0.2 (deployed by helm chart)
+* Helm - 3.3.0
+
 ## Terms and Abbreviations
 
 * `kubectl` is usually aliased to `k`.
