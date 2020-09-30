@@ -20,8 +20,7 @@
          * [Pod Security Policies](#pod-security-policies)
          * [Deploy](#deploy)
          * [Add LoadBalancer IP to DNS](#add-loadbalancer-ip-to-dns)
-         * [Validate Certificate](#validate-certificate)
-         * [Login to Harbor](#login-to-harbor)
+         * [Login to the Harbor Web Interface](#login-to-the-harbor-web-interface)
          * [Push an Image](#push-an-image)
       * [Conclusion](#conclusion)
       * [Clean Up](#clean-up)
@@ -55,8 +54,11 @@ The open source Harbor project also provides a [similar helm chart](https://gith
 
 * A Kubernetes cluster with a `LoadBalancer` and persistent volumes
 * A Linux, Windows WSL, or MacOS terminal to use various commands
-* Helm CLI installed
+* Helm 3 CLI installed
 * Optional: `kubectx` and `kubens` installed
+* `mkcert` will also be used to manage certificates
+* Ability to manage DNS entries
+* Docker installed to push and pull imagess
 
 ## Terms and Abbreviations
 
@@ -66,7 +68,7 @@ The open source Harbor project also provides a [similar helm chart](https://gith
 alias kubectl=k
 ```
 
-* `kubens` and `kubectx` are often used to switch between clusters and namespaces. Also they are typically aliased to kn and kc respectively.
+* `kubens` and `kubectx` are often used to switch between clusters and namespaces. Also they are typically aliased to `kn` and `kc` respectively.
 * `SNIP!` is used in command output to indicate some removed text.
 
 ## Create a TKG Cluster
@@ -79,7 +81,7 @@ The Tanzu Kubernetes Grid service has been deployed into a vSphere cluster and t
 
 *NOTE: vSphere with Tanzu/Kubernetes also has a native, integrated Harbor deployment (very easy to use, just click "Harbor Enable"), but this demo will not use that option and instead, for the purposes of demonstration, deploy a completely separate Harbor deployment.*
 
-Now we can build a TKG workload cluster by "talking Kubernetes" to the service cluster, and the way that you usually talk to Kubernetes is via, yes, you guessed it, YAML.
+Now we can build a TKG workload cluster by "talking Kubernetes" to the service cluster, and the way that you usually talk to Kubernetes is via, yes, you guessed it, YAML, and we'll use `kubectl` to apply that YAML.
 
 **Create a Supervisor Namespace**
 
@@ -277,9 +279,7 @@ The local CA is already installed in Java's trust store! 👍
 
 ### Create Certificate
 
-First, determine your domain. By default the domain in the values file is `harbor.domain`.
-
-In the demo we will use `harbor.wcp-workloads.oakwood.ave` as the subdomain.
+First, decide on a subdomain. By default the subdomain in the values file is `harbor.domain`. In this demo I'll use `harbor.wcp-workloads.oakwood.ave` as the subdomain, but if you are working in this in your own lab your should pick an appropriate subdomain for your situation.
 
 Create the TLS certificates with `mkcert`.
 
@@ -295,6 +295,7 @@ Created a new certificate valid for the following names 📜
 
 The certificate is at "./harbor.harbor.wcp-workloads.oakwood.ave+2.pem" and the key at "./harbor.harbor.wcp-workloads.oakwood.ave+2-key.pem" ✅
 ```
+
 ## Deploy Harbor
 
 The best way to deploy Harbor into a Kubernetes cluster is using a Helm chart. But then the question becomes, where do you get the helm chart?
@@ -305,17 +306,17 @@ At this time a demo site exists for helm charts that is available for use.
 
 **Using the Tanzu Application Catalog**
 
-What is the Tanzu Application Catalog (TAC)?
+What is the Tanzu Application Catalog (TAC)? TAC can be used to:
 
 >Curate a catalog of production-ready open-source software from the Bitnami collection.
 
-TAC allows oraganztions to have access to a large catalog of applications and open source software that they can then curate their own catalog from. Typically this is used to provide "stacks" to development teams, and is especially useful in organizations where teams are building microservices with individual stacks.
+TAC allows organizations to have access to a large catalog of applications and open source software that they can then curate their own catalog from. Typically this is used to provide "stacks" to development teams, and is especially useful in organizations where teams are building microservices with individual stacks.
 
 Below you can see a screenshot of TAC. The "By Type" option allows for choosing container images or helm charts as the artifact.S
 
 ![tanzu application catalog](images/tac1.png)
 
-And one of the helm charts availble is for Harbor.
+And one of the helm charts available is for Harbor.
 
 ![harbor tac helm chart](images/tac2.png)
 
@@ -338,14 +339,14 @@ That's it!
 Download the values file.
 
 ```
-helm show values tac/harbor > values.yml
+helm show values tac/harbor --version 7.2.0 > values.yml
 ```
 
 Now that we have the values file, we can edit it and configure it for our environment.
 
 ### Add a Namespace
 
-Now create a namespace.
+Now create a namespace to deploy Harbor into.
 
 ```
 k create ns harbor
@@ -386,8 +387,8 @@ There are a few lines to edit in the values file.
 * Change `harbor.domain` to your domain
 * Set the name of the TLS secret
 * Set the global storage policy
-* Set the resource policy to not keep PVCs on delete
-* Set the admin password to "admin"
+* OPTIONAL: Set the resource policy to not keep PVCs on delete
+* OPTIONAL: Set the admin password to "admin", or something that you prefer. Otherwise helm will set a random password, which is fine too.
 * OPTIONAL: Set a load balancer IP
 
 ```
@@ -484,7 +485,9 @@ Create the cluster role and role binding.
 k create -f harbor-rbac.yml
 ```
 
-### Deploy 
+### Deploy
+
+At this point we can deploy Harbor!
 
 ```
 $ helm install harbor tac/harbor --debug --version 7.2.0 -f values.yml
@@ -558,7 +561,7 @@ harbor   LoadBalancer   10.110.208.45   10.1.1.5      80:32543/TCP,443:31886/TCP
 
 Now ensure the DNS name you gave the harbor service resolves.
 
-In my case I'm simply using DNSmasq as my DNS server, and I've configured the below. Your DNS server will be different, but the same configuration should be made.
+In my case I'm simply using DNSmasq as my DNS server, and I've configured the below. Your DNS server or `/etc/hosts` will be different, but the same entries should be made.
 
 ```
 $ grep harbor.wcp-workloads /etc/hosts
@@ -567,20 +570,14 @@ $ grep harbor.wcp-workloads /etc/hosts
 10.1.1.5 notary.harbor.wcp-workloads.oakwood.ave
 ```
 
-### Validate Certificate
-
-Ensure that the TLS certificate available on the main service IP/Domain is the one that was created by `mkcert`.
-
-```
-$ openssl s_client -showcerts -connect harbor.harbor.wcp-workloads.oakwood.ave:443 </dev/null
-```
-
-### Login to Harbor
+### Login to the Harbor Web Interface
 
 Access the Harbor domain name that was configured via https.
 
+```
 Login: admin
 Password: admin
+```
 
 *NOTE: This assumes you changed it in the values file.*
 
@@ -588,7 +585,7 @@ Password: admin
 
 ### Push an Image
 
-First, login to harbor.
+First, login to harbor with Docker.
 
 *NOTE: This assumes the CA has been installed into where ever you are running docker from. In this demo example, docker is running on the same Linux node as where `mkcert` was installed and run.*
 
@@ -646,15 +643,15 @@ In the Harbor GUI, the nginx repository should now be visible.
 
 ## Conclusion
 
-At this point a fully usable Harbor instance has been deployed to Kuberentes via helm, and images can be pushed to it. It's amazing what you can do with a helm chart and a few variables.
+At this point a fully usable Harbor instance has been deployed to Kubernetes via helm, and images can be pushed to it. It's amazing what you can do with a helm chart and a few variables!
 
 It's important to note that in order to use this registry from a Kubernetes cluster the cluster nodes would have to have the Certificate Authority installed. 
 
 ## Clean Up
 
-Ensure you are in the right cluster and namespace!
+Ensure you are in the right cluster and namespace before deleting anything!
 
-*NOTE: The helm values in this demo are set so that persistent volumes will NOT be kept after `helm delete`.
+*NOTE: The helm values in this demo are set so that persistent volumes will NOT be kept after `helm delete`.*
 
 ```
 helm delete harbor 
@@ -662,3 +659,5 @@ for i in `k get pvc | grep -v NAME | tr -s " " | cut -f 1 -d " "`; do k delete p
 ```
 
 In vSphere, remove the `harbor-namespace` supervisor namespace. Of course this will delete the entire cluster that was created!
+
+Also remove the local docker images that were used, if any.
