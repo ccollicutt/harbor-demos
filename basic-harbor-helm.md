@@ -668,3 +668,14 @@ for i in `k get pvc | grep -v NAME | tr -s " " | cut -f 1 -d " "`; do k delete p
 In vSphere, remove the `harbor-namespace` supervisor namespace. Of course this will delete the entire cluster that was created!
 
 Also remove the local docker images that were used, if any.
+
+```
+docker rmi nginx
+docker rmi harbor.harbor.wcp-workloads.oakwood.ave/library/nginx
+```
+
+Remove the clusters from your local kubeconfig.
+
+```
+kc -d <name of cluster>
+```

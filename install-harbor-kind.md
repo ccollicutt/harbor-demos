@@ -2,13 +2,13 @@
 
 This document will discuss installing the Harbor container image registry on a workstation.
 
-Requirements:
+## Requirements
 
 * This document assumes OSX
 * Brew is installed
 * [Docker for Desktop for OSX](https://docs.docker.com/docker-for-mac/install/) is installed
 
-## Kind
+## Using Kind
 
 Kind stands for "Kubernetes in Docker" and is an easy way to get a local Kubernetes cluster running.
 
@@ -55,7 +55,7 @@ NAME                 STATUS   ROLES    AGE     VERSION
 kind-control-plane   Ready    master   2m31s   v1.17.0
 ```
 
-## Contour Ingress
+## Install Contour Ingress
 
 [Contour](https://projectcontour.io/) is an advanced open source ingress system supported in part by VMware.
 
